@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sessme Seedz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Quicksand:wght@400;600;700&family=Sour+Gummy:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #fff0f3;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --accent-soft: #ffccd5;
+      --accent-primary: #ffb3c1;
+      --text-main: #5e5061;
+      --text-muted: #9a889c;
+      --border-color: #ffb3c1;
+      --button-text: #ffffff;
+      --card-shadow: 0 10px 25px -5px rgba(255, 179, 193, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      transition: background-color 0.5s ease;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    #effects-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .theme-aurora {
+      background: linear-gradient(-45deg, #fde2e4, #e2ece9, #dfe7fd, #fff1e6);
+      background-size: 400% 400%;
+      animation: auroraGlow 15s ease infinite;
+    }
+
+    @keyframes auroraGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glitter-border {
+      position: relative;
+    }
+    .glitter-border::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 26px;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-soft), #d8e2dc, var(--accent-soft), var(--accent-primary));
+      background-size: 300% 300%;
+      z-index: -1;
+      animation: glitter 4s linear infinite;
+    }
+
+    @keyframes glitter {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 680px;
+      z-index: 2;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 10px 5px;
+    }
+
+    h1.brand-title {
+      font-family: 'Sour Gummy', cursive;
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      letter-spacing: 0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .seed-badge {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    }
+
+    .theme-btn {
+      background: var(--accent-primary);
+      color: var(--button-text);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Caveat', cursive;
+      font-size: 1.3rem;
+      transition: all 0.2s;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.04);
+      filter: brightness(0.96);
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 2px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      transition: border-color 0.4s ease;
+    }
+
+    .card-title {
+      font-family: 'Caveat', cursive;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 2px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 0.95rem;
+      outline: none;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-primary);
+    }
+
+    textarea.input-field {
+      height: 130px;
+      resize: vertical;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      width: 50px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .action-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 18px;
+      background: var(--accent-primary);
+      color: var(--button-text);
+      font-family: 'Sour Gummy', cursive;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.95);
+    }
+
+    .secondary-btn {
+      background: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .secondary-btn:hover {
+      background: var(--accent-soft);
+    }
+
+    .ai-fab {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 20px var(--accent-soft), 0 4px 15px rgba(0,0,0,0.08);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Sour Gummy', cursive;
+      font-size: 1.8rem;
+      color: var(--button-text);
+      z-index: 10;
+      transition: transform 0.2s;
+    }
+
+    .ai-fab:hover {
+      transform: scale(1.1);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      border: 2px solid var(--border-color);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .shop-section {
+      margin-bottom: 20px;
+    }
+    .shop-section h3 {
+      font-family: 'Caveat', cursive;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: var(--text-main);
+    }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .shop-item {
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.6);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .shop-item button {
+      border: none;
+      background: var(--accent-primary);
+      color: var(--button-text);
+      padding: 6px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .shop-item button.owned {
+      background: var(--text-muted);
+    }
+
+    .quiz-card {
+      background: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .quiz-type-tag {
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .ai-chat-box {
+      height: 200px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      background: #fafafa;
+      font-size: 0.9rem;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input-row input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      outline: none;
+    }
+    .chat-input-row button {
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent-primary);
+      color: var(--button-text);
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="effects-canvas"></canvas>
+
+  <div class="app-container">
+    <header>
+      <h1 class="brand-title">Sessme Seedz</h1>
+      <div class="header-actions">
+        <div class="seed-badge">
+          Seeds: <span id="seed-count">0</span>
+        </div>
+        <button class="theme-btn" onclick="openShop()">Shop</button>
+        <button class="secondary-btn" onclick="openKeyModal()">API</button>
+      </div>
+    </header>
+
+    <div class="card" id="main-card">
+      <div class="card-title">
+        <span>Welcome to Sessme Seedz! Insert notes here</span>
+        <button class="secondary-btn" onclick="loadSampleNotes()">Try Sample</button>
+      </div>
+
+      <input type="text" id="subject-title" class="input-field" placeholder="Subject / Topic (e.g. Biology - Photosynthesis)">
+      <textarea id="user-notes" class="input-field" placeholder="Paste your study notes, summary, or lecture text here..."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Choose Your Questions</div>
+      
+      <div class="input-group" style="margin-bottom: 12px; background: #ffffff;">
+        <label for="total-q">Total Number of Questions:</label>
+        <input type="number" id="total-q" value="5" min="1" max="50">
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label>Multiple Choice</label>
+          <input type="number" class="q-type" id="q-mc" value="2" min="0">
+        </div>
+        <div class="input-group">
+          <label>Matching</label>
+          <input type="number" class="q-type" id="q-matching" value="1" min="0">
+        </div>
+        <div class="input-group">
+          <label>Written</label>
+          <input type="number" class="q-type" id="q-written" value="1" min="0">
+        </div>
+        <div class="input-group">
+          <label>One Word Answers</label>
+          <input type="number" class="q-type" id="q-oneword" value="1" min="0">
+        </div>
+        <div class="input-group">
+          <label>Fill in the Blanks</label>
+          <input type="number" class="q-type" id="q-fillblank" value="0" min="0">
+        </div>
+      </div>
+
+      <button class="action-btn" onclick="generateQuizAndEarnSeed()">Generate Quiz (+1 Seed)</button>
+    </div>
+
+    <div class="card" id="output-card" style="display: none;">
+      <div class="card-title" id="output-title">Your Generated Study Kit</div>
+      <div id="quiz-results"></div>
+    </div>
+  </div>
+
+  <button class="ai-fab" onclick="openAiChat()">?</button>
+
+  <div class="modal-overlay" id="shop-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="font-family: 'Sour Gummy'; color: var(--accent-primary);">Seedz Shop</h2>
+        <button class="modal-close" onclick="closeShop()">&times;</button>
+      </div>
+
+      <div class="shop-section">
+        <h3>Free Soft Color Palettes</h3>
+        <div class="shop-grid">
+          <div class="shop-item">
+            <span>Sakura Bloom</span>
+            <button onclick="setPalette('sakura')">Equip</button>
+          </div>
+          <div class="shop-item">
+            <span>Mint Boba</span>
+            <button onclick="setPalette('mint')">Equip</button>
+          </div>
+          <div class="shop-item">
+            <span>Lavender Haze</span>
+            <button onclick="setPalette('lavender')">Equip</button>
+          </div>
+          <div class="shop-item">
+            <span>Peach Sorbet</span>
+            <button onclick="setPalette('peach')">Equip</button>
+          </div>
+          <div class="shop-item">
+            <span>Honey Butter</span>
+            <button onclick="setPalette('honey')">Equip</button>
+          </div>
+          <div class="shop-item">
+            <span>Cloud Blue</span>
+            <button onclick="setPalette('cloud')">Equip</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h3>Special Themes & FX</h3>
+        <div class="shop-grid">
+          <div class="shop-item">
+            <span>Rain Animation</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">2 Seeds</span>
+            <button id="btn-fx-rain" onclick="buyItem('rain', 2)">Buy</button>
+          </div>
+          <div class="shop-item">
+            <span>Glitter Outline</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">3 Seeds</span>
+            <button id="btn-fx-glitter" onclick="buyItem('glitter', 3)">Buy</button>
+          </div>
+          <div class="shop-item">
+            <span>Aurora Sky</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">5 Seeds</span>
+            <button id="btn-fx-aurora" onclick="buyItem('aurora', 5)">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="key-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="font-family: 'Sour Gummy'; color: var(--accent-primary);">API Settings</h2>
+        <button class="modal-close" onclick="closeKeyModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+        Optional: Paste a Gemini API key if you want real AI processing. It stays securely in your browser local memory only.
+      </p>
+      <input type="password" id="api-key-input" class="input-field" placeholder="Paste Gemini API Key here...">
+      <button class="action-btn" style="margin-top: 5px;" onclick="saveApiKey()">Save Key</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="ai-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="font-family: 'Sour Gummy'; color: var(--accent-primary);">Ask AI Assistant</h2>
+        <button class="modal-close" onclick="closeAiChat()">&times;</button>
+      </div>
+      <div class="ai-chat-box" id="chat-box">
+        <p style="color: var(--text-muted); font-style: italic;">Ask any questions about your study topic or notes!</p>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Explain a concept simply...">
+        <button onclick="sendAiMessage()">Ask</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let seeds = 0;
+    let inventory = [];
+    let activeFx = null;
+    let currentPalette = 'sakura';
+
+    const seedDisplay = document.getElementById('seed-count');
+    const canvas = document.getElementById('effects-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function initAppState() {
+      const hasVisited = localStorage.getItem('sessme_visited');
+      if (!hasVisited) {
+        localStorage.setItem('sessme_visited', 'true');
+        localStorage.setItem('sessme_seeds', '0');
+        localStorage.setItem('sessme_inventory', JSON.stringify([]));
+        localStorage.setItem('sessme_palette', 'sakura');
+      } else {
+        seeds = parseInt(localStorage.getItem('sessme_seeds')) || 0;
+        inventory = JSON.parse(localStorage.getItem('sessme_inventory') || '[]');
+        currentPalette = localStorage.getItem('sessme_palette') || 'sakura';
+      }
+
+      updateSeeds(0);
+      setPalette(currentPalette);
+      refreshShopButtons();
+      restoreSavedNotes();
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function updateSeeds(amount) {
+      seeds += amount;
+      localStorage.setItem('sessme_seeds', seeds.toString());
+      seedDisplay.innerText = seeds;
+    }
+
+    function setPalette(theme) {
+      currentPalette = theme;
+      localStorage.setItem('sessme_palette', theme);
+      const root = document.documentElement;
+
+      if (theme === 'sakura') {
+        root.style.setProperty('--bg-primary', '#fff0f3');
+        root.style.setProperty('--accent-soft', '#ffccd5');
+        root.style.setProperty('--accent-primary', '#ffb3c1');
+        root.style.setProperty('--border-color', '#ffccd5');
+        root.style.setProperty('--text-main', '#5e5061');
+        root.style.setProperty('--button-text', '#ffffff');
+      } else if (theme === 'mint') {
+        root.style.setProperty('--bg-primary', '#f2f8f5');
+        root.style.setProperty('--accent-soft', '#d8e2dc');
+        root.style.setProperty('--accent-primary', '#b8dbd9');
+        root.style.setProperty('--border-color', '#d8e2dc');
+        root.style.setProperty('--text-main', '#3d5a80');
+        root.style.setProperty('--button-text', '#2b2d42');
+      } else if (theme === 'lavender') {
+        root.style.setProperty('--bg-primary', '#f8f7ff');
+        root.style.setProperty('--accent-soft', '#e0aaff');
+        root.style.setProperty('--accent-primary', '#c77dff');
+        root.style.setProperty('--border-color', '#e0aaff');
+        root.style.setProperty('--text-main', '#4a4e69');
+        root.style.setProperty('--button-text', '#ffffff');
+      } else if (theme === 'peach') {
+        root.style.setProperty('--bg-primary', '#fff3eb');
+        root.style.setProperty('--accent-soft', '#fde2e4');
+        root.style.setProperty('--accent-primary', '#ffcad4');
+        root.style.setProperty('--border-color', '#fde2e4');
+        root.style.setProperty('--text-main', '#6d597a');
+        root.style.setProperty('--button-text', '#ffffff');
+      } else if (theme === 'honey') {
+        root.style.setProperty('--bg-primary', '#fdf6e7');
+        root.style.setProperty('--accent-soft', '#f7d6a3');
+        root.style.setProperty('--accent-primary', '#f4a261');
+        root.style.setProperty('--border-color', '#f7d6a3');
+        root.style.setProperty('--text-main', '#4a3b32');
+        root.style.setProperty('--button-text', '#ffffff');
+      } else if (theme === 'cloud') {
+        root.style.setProperty('--bg-primary', '#f0f4f8');
+        root.style.setProperty('--accent-soft', '#bccce0');
+        root.style.setProperty('--accent-primary', '#9bb1d0');
+        root.style.setProperty('--border-color', '#bccce0');
+        root.style.setProperty('--text-main', '#334155');
+        root.style.setProperty('--button-text', '#ffffff');
+      }
+    }
+
+    function openShop() { document.getElementById('shop-modal').style.display = 'flex'; }
+    function closeShop() { document.getElementById('shop-modal').style.display = 'none'; }
+
+    function refreshShopButtons() {
+      ['rain', 'glitter', 'aurora'].forEach(itemId => {
+        const btn = document.getElementById(`btn-fx-${itemId}`);
+        if (btn && inventory.includes(itemId)) {
+          btn.innerText = activeFx === itemId ? "Active" : "Equip";
+          btn.classList.add("owned");
+        }
+      });
+    }
+
+    function buyItem(itemId, cost) {
+      if (inventory.includes(itemId)) {
+        applyEffect(itemId);
+        refreshShopButtons();
+        return;
+      }
+
+      if (seeds >= cost) {
+        updateSeeds(-cost);
+        inventory.push(itemId);
+        localStorage.setItem('sessme_inventory', JSON.stringify(inventory));
+        applyEffect(itemId);
+        refreshShopButtons();
+      } else {
+        alert("Not enough seeds! Generate quizzes to earn seeds.");
+      }
+    }
+
+    function applyEffect(effect) {
+      document.body.classList.remove('theme-aurora');
+      document.getElementById('main-card').classList.remove('glitter-border');
+      stopRainAnimation();
+
+      if (activeFx === effect) {
+        activeFx = null;
+        refreshShopButtons();
+        return;
+      }
+
+      activeFx = effect;
+      if (effect === 'rain') {
+        startRainAnimation();
+      } else if (effect === 'glitter') {
+        document.getElementById('main-card').classList.add('glitter-border');
+      } else if (effect === 'aurora') {
+        document.body.classList.add('theme-aurora');
+      }
+      refreshShopButtons();
+    }
+
+    let rainParticles = [];
+    let rainInterval = null;
+
+    function startRainAnimation() {
+      rainParticles = Array.from({ length: 60 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        length: Math.random() * 20 + 15,
+        speed: Math.random() * 4 + 3,
+        opacity: Math.random() * 0.4 + 0.3
+      }));
+
+      function renderRain() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        rainParticles.forEach(p => {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x, p.y + p.length);
+          ctx.strokeStyle = `rgba(180, 200, 220, ${p.opacity})`;
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          p.y += p.speed;
+          if (p.y > canvas.height) {
+            p.y = -20;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+
+        if (activeFx === 'rain') rainInterval = requestAnimationFrame(renderRain);
+      }
+      renderRain();
+    }
+
+    function stopRainAnimation() {
+      if (rainInterval) cancelAnimationFrame(rainInterval);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function openKeyModal() {
+      document.getElementById('key-modal').style.display = 'flex';
+      const key = localStorage.getItem('sessme_gemini_key') || '';
+      if (key) document.getElementById('api-key-input').value = key;
+    }
+    function closeKeyModal() { document.getElementById('key-modal').style.display = 'none'; }
+
+    function saveApiKey() {
+      const val = document.getElementById('api-key-input').value.trim();
+      if (val) {
+        localStorage.setItem('sessme_gemini_key', val);
+        alert('API Key saved locally!');
+      } else {
+        localStorage.removeItem('sessme_gemini_key');
+        alert('API Key cleared.');
+      }
+      closeKeyModal();
+    }
+
+    function loadSampleNotes() {
+      document.getElementById('subject-title').value = "Biology - Cell Energetics";
+      document.getElementById('user-notes').value = "Photosynthesis turns sunlight into chemical energy inside chloroplasts. Chlorophyll absorbs solar light waves. Mitochondria perform cellular respiration to break down glucose into ATP energy units for the cell.";
+      saveNotesLocally();
+    }
+
+    function saveNotesLocally() {
+      const subject = document.getElementById('subject-title').value;
+      const notes = document.getElementById('user-notes').value;
+      localStorage.setItem('sessme_last_subject', subject);
+      localStorage.setItem('sessme_last_notes', notes);
+    }
+
+    function restoreSavedNotes() {
+      const savedSubject = localStorage.getItem('sessme_last_subject');
+      const savedNotes = localStorage.getItem('sessme_last_notes');
+      if (savedSubject) document.getElementById('subject-title').value = savedSubject;
+      if (savedNotes) document.getElementById('user-notes').value = savedNotes;
+    }
+
+    document.getElementById('subject-title').addEventListener('input', saveNotesLocally);
+    document.getElementById('user-notes').addEventListener('input', saveNotesLocally);
+
+    function generateQuizAndEarnSeed() {
+      const notes = document.getElementById('user-notes').value.trim();
+      const subject = document.getElementById('subject-title').value.trim() || "Study Notes";
+
+      if (!notes) {
+        alert("Please insert some notes first!");
+        return;
+      }
+
+      updateSeeds(1);
+
+      const outputCard = document.getElementById('output-card');
+      const outputTitle = document.getElementById('output-title');
+      const resultsDiv = document.getElementById('quiz-results');
+      outputCard.style.display = 'block';
+      outputTitle.innerText = `${subject} - Study Kit`;
+
+      const mcCount = parseInt(document.getElementById('q-mc').value) || 0;
+      const matchCount = parseInt(document.getElementById('q-matching').value) || 0;
+      const writtenCount = parseInt(document.getElementById('q-written').value) || 0;
+      const onewordCount = parseInt(document.getElementById('q-oneword').value) || 0;
+      const fillblankCount = parseInt(document.getElementById('q-fillblank').value) || 0;
+
+      let html = `<div style="padding: 8px; margin-bottom: 12px; font-weight: bold; color: var(--text-main);">+1 Seed Earned! Here are your customized practice questions:</div>`;
+
+      let qIndex = 1;
+
+      for (let i = 0; i < mcCount; i++) {
+        html += `
+          <div class="quiz-card">
+            <div class="quiz-type-tag">Multiple Choice</div>
+            <p><strong>Q${qIndex++}:</strong> What main concept is described in the passage for key term #${i+1}?</p>
+            <div style="margin-top: 8px; font-size: 0.9rem;">
+              <label><input type="radio" name="mc${i}"> A) Core function</label><br>
+              <label><input type="radio" name="mc${i}"> B) Secondary detail</label><br>
+              <label><input type="radio" name="mc${i}"> C) Opposite mechanism</label>
+            </div>
+          </div>`;
+      }
+
+      for (let i = 0; i < matchCount; i++) {
+        html += `
+          <div class="quiz-card">
+            <div class="quiz-type-tag">Matching</div>
+            <p><strong>Q${qIndex++}:</strong> Match the term from your notes to its definition:</p>
+            <p style="font-size: 0.9rem; margin-top: 4px;">Term #${i+1} ➔ [ Select Definition Dropdown ]</p>
+          </div>`;
+      }
+
+      for (let i = 0; i < writtenCount; i++) {
+        html += `
+          <div class="quiz-card">
+            <div class="quiz-type-tag">Written Answer</div>
+            <p><strong>Q${qIndex++}:</strong> Explain in your own words the main process outlined in "${subject}":</p>
+            <input type="text" class="input-field" style="margin-top: 8px;" placeholder="Type your response here...">
+          </div>`;
+      }
+
+      for (let i = 0; i < onewordCount; i++) {
+        html += `
+          <div class="quiz-card">
+            <div class="quiz-type-tag">One Word Answer</div>
+            <p><strong>Q${qIndex++}:</strong> What single word best summarizes topic aspect #${i+1}?</p>
+            <input type="text" class="input-field" style="margin-top: 8px;" placeholder="One word answer...">
+          </div>`;
+      }
+
+      for (let i = 0; i < fillblankCount; i++) {
+        html += `
+          <div class="quiz-card">
+            <div class="quiz-type-tag">Fill in the Blanks</div>
+            <p><strong>Q${qIndex++}:</strong> The primary energy process described in the notes is __________.</p>
+            <input type="text" class="input-field" style="margin-top: 8px;" placeholder="Fill in the blank...">
+          </div>`;
+      }
+
+      resultsDiv.innerHTML = html;
+      outputCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openAiChat() { document.getElementById('ai-modal').style.display = 'flex'; }
+    function closeAiChat() { document.getElementById('ai-modal').style.display = 'none'; }
+
+    function sendAiMessage() {
+      const input = document.getElementById('chat-input');
+      const chatBox = document.getElementById('chat-box');
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      chatBox.innerHTML += `<p style="margin-bottom: 6px;"><strong>You:</strong> ${userText}</p>`;
+      input.value = '';
+
+      setTimeout(() => {
+        chatBox.innerHTML += `<p style="color: var(--accent-primary); margin-bottom: 6px;"><strong>AI:</strong> Here is a study tip regarding your question based on your notes!</p>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 400);
+    }
+
+    window.onload = initAppState;
+  </script>
+</body>
+</html>
